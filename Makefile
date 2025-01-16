@@ -54,7 +54,7 @@ docs: install ## generate docs
 	#pip install black pdoc 
 	#black machinelearner/* --line-length=80	
 	#find machinelearner/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
-	pdoc -t docs machinelearner/* --output-dir machinelearner-docs
+	pdoc -t docs src/machinelearner/* --output-dir machinelearner-docs
 	find . -name '__pycache__' -exec rm -fr {} +
 	cp -rf machinelearner-docs/* ../../Pro_Website/Techtonique.github.io/machinelearner
 
@@ -62,7 +62,7 @@ servedocs: install ## compile the docs watching for change
 	#pip install black pdoc 
 	#black machinelearner/* --line-length=80	
 	#find machinelearner/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
-	pdoc -t docs machinelearner/* 
+	pdoc -t docs src/machinelearner/* 
 	find . -name '__pycache__' -exec rm -fr {} +
 
 release: dist ## package and upload a release

@@ -6,7 +6,6 @@ class BaseModel(BaseEstimator):
     """
     Base class for dynamically loading and wrapping scikit-learn models.
     """
-
     def __init__(self, base_model, **kwargs):
         """
         Initialize a scikit-learn model dynamically.
@@ -58,6 +57,7 @@ class BaseModel(BaseEstimator):
         Parameters:
         - X (array-like): Training data features.
         - y (array-like): Target values.
+        - **kwargs: Additional parameters to pass to the scikit-learn model fit method.
         """
         self.model.fit(X, y, **kwargs)
         return self
@@ -68,7 +68,7 @@ class BaseModel(BaseEstimator):
 
         Parameters:
         - X (array-like): Input data.
-
+        - **kwargs: Additional parameters to pass to the scikit-learn model predict method.
         Returns:
         - array-like: Predictions.
         """
@@ -81,7 +81,8 @@ class BaseModel(BaseEstimator):
         Parameters:
         - X (array-like): Test data features.
         - y (array-like): True labels.
-
+        - **kwargs: Additional parameters to pass to the scikit-learn model score method.
+        
         Returns:
         - float: The score.
         """
