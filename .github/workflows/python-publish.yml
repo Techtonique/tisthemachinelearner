@@ -33,5 +33,5 @@ jobs:
       - name: Publish to PyPI                
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          password: ${{ secrets.PYPI_tisthemachinelearner }}
+          password: ${{ secrets.PYPI_MACHINELEARNER }}
           repository-url: https://upload.pypi.org/legacy/
