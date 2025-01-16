@@ -5,7 +5,7 @@ tisthemachinelearner
 
 Lightweight interface to scikit-learn with 2 classes, Classifier and Regressor. 
 
-![PyPI](https://img.shields.io/pypi/v/tisthemachinelearner) [![PyPI - License](https://img.shields.io/pypi/l/tisthemachinelearner)](https://github.com/Techtonique/tisthemachinelearner/LICENSE) [![Downloads](https://pepy.tech/badge/tisthemachinelearner)](https://pepy.tech/project/tisthemachinelearner) 
+![PyPI](https://img.shields.io/pypi/v/tisthemachinelearner) [![PyPI - License](https://img.shields.io/pypi/l/tisthemachinelearner)](./LICENSE) [![Downloads](https://pepy.tech/badge/tisthemachinelearner)](https://pepy.tech/project/tisthemachinelearner) 
 [![HitCount](https://hits.dwyl.com/Techtonique/tisthemachinelearner.svg?style=flat-square)](http://hits.dwyl.com/Techtonique/tisthemachinelearner)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/tisthemachinelearner/)
 
