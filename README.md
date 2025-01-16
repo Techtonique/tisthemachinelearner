@@ -1,8 +1,6 @@
 machinelearner
 --------
 
-![machinelearner logo](the-machinelearner.png)
-
 <hr>
 
 Lightweight interface to scikit-learn with 2 classes, Classifier and Regressor. 
