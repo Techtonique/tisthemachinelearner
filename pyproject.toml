@@ -1,0 +1,15 @@
+[project]
+name = "machinelearner"
+version = "0.1.0"
+description = "Slim interface to scikit-learn with 2 classes"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["scikit-learn"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]  # list of folders that contain the packages (["."] by default)
+include = ["machinelearner*"]  # package names should match these glob patterns
