@@ -1,7 +1,7 @@
 [project]
 name = "machinelearner"
 version = "0.1.0"
-description = "Lightweight interface to scikit-learn with 2 classes, Classifier and Regressor"
+description = "git"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = ["scikit-learn"]
