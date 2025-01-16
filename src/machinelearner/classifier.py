@@ -22,6 +22,11 @@ class Classifier(BaseModel, ClassifierMixin):
         clf.fit(X_train, y_train)
         print(clf.predict(X_test))
         print(clf.score(X_test, y_test))
+
+        clf = Classifier("RandomForestClassifier", n_estimators=100, random_state=42)
+        clf.fit(X_train, y_train)
+        print(clf.predict(X_test))
+        print(clf.score(X_test, y_test))
         ```
     """
     pass

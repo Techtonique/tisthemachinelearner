@@ -22,6 +22,11 @@ class Regressor(BaseModel, RegressorMixin):
         reg.fit(X_train, y_train)
         print(reg.predict(X_test))
         print(reg.score(X_test, y_test))
+
+        reg = Regressor("RidgeCV", alphas=[0.01, 0.1, 1, 10])
+        reg.fit(X_train, y_train)
+        print(reg.predict(X_test))
+        print(np.sqrt(np.mean((reg.predict(X_test) - y_test) ** 2)))
         ```
     """
     pass
