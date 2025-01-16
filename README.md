@@ -5,7 +5,7 @@ machinelearner
 
 Lightweight interface to scikit-learn with 2 classes, Classifier and Regressor. 
 
-![PyPI](https://img.shields.io/pypi/v/machinelearner) [![PyPI - License](https://img.shields.io/pypi/l/machinelearner)](https://github.com/thierrymoudiki/machinelearner/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/machinelearner)](https://pepy.tech/project/machinelearner) 
+![PyPI](https://img.shields.io/pypi/v/machinelearner) [![PyPI - License](https://img.shields.io/pypi/l/machinelearner)](https://github.com/Techtonique/machinelearner/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/machinelearner)](https://pepy.tech/project/machinelearner) 
 [![HitCount](https://hits.dwyl.com/Techtonique/machinelearner.svg?style=flat-square)](http://hits.dwyl.com/Techtonique/machinelearner)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/machinelearner/)
 
