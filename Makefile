@@ -45,24 +45,24 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov
 
 lint: ## check style with flake8
-	flake8 machinelearner tests
+	flake8 tisthemachinelearner tests
 
 coverage: ## check code coverage quickly with the default Python	
-	coverage report --omit="venv/*,machinelearner/tests/*" --show-missing
+	coverage report --omit="venv/*,tisthemachinelearner/tests/*" --show-missing
 
 docs: install ## generate docs		
 	#pip install black pdoc 
-	#black machinelearner/* --line-length=80	
-	#find machinelearner/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
-	pdoc -t docs src/machinelearner/* --output-dir machinelearner-docs
+	#black tisthemachinelearner/* --line-length=80	
+	#find tisthemachinelearner/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
+	pdoc -t docs src/tisthemachinelearner/* --output-dir tisthemachinelearner-docs
 	find . -name '__pycache__' -exec rm -fr {} +
-	cp -rf machinelearner-docs/* ../../Pro_Website/Techtonique.github.io/machinelearner
+	cp -rf tisthemachinelearner-docs/* ../../Pro_Website/Techtonique.github.io/tisthemachinelearner
 
 servedocs: install ## compile the docs watching for change	 	
 	#pip install black pdoc 
-	#black machinelearner/* --line-length=80	
-	#find machinelearner/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
-	pdoc -t docs src/machinelearner/* 
+	#black tisthemachinelearner/* --line-length=80	
+	#find tisthemachinelearner/ -name "*.py" -exec autopep8 --max-line-length=80 --in-place {} +
+	pdoc -t docs src/tisthemachinelearner/* 
 	find . -name '__pycache__' -exec rm -fr {} +
 
 release: dist ## package and upload a release
@@ -78,7 +78,7 @@ install: clean ## install the package to the active Python's site-packages
 	uv pip install -e . --verbose --no-cache-dir --upgrade
 
 build-site: docs ## export mkdocs website to a folder		
-	cp -rf machinelearner-docs/* ../../Pro_Website/Techtonique.github.io/machinelearner
+	cp -rf tisthemachinelearner-docs/* ../../Pro_Website/Techtonique.github.io/tisthemachinelearner
 	find . -name '__pycache__' -exec rm -fr {} +
 
 run-custom: ## run all custom examples with one command
@@ -98,5 +98,5 @@ run-conformal: ## run all lazy examples with one command
 
 run-tests: install ## run all the tests with one command
 	pip3 install coverage nose2
-	python3 -m coverage run -m unittest discover -s machinelearner/tests -p "*.py"	
+	python3 -m coverage run -m unittest discover -s tisthemachinelearner/tests -p "*.py"	
 

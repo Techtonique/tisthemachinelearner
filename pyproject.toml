@@ -1,5 +1,5 @@
 [project]
-name = "machinelearner"
+name = "tisthemachinelearner"
 version = "0.1.0"
 description = "git"
 readme = "README.md"
@@ -12,4 +12,4 @@ build-backend = "hatchling.build"
 
 [tool.setuptools.packages.find]
 where = ["src"]  # list of folders that contain the packages (["."] by default)
-include = ["machinelearner*"]  # package names should match these glob patterns
+include = ["tisthemachinelearner*"]  # package names should match these glob patterns

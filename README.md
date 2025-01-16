@@ -1,13 +1,13 @@
-machinelearner
+tisthemachinelearner
 --------
 
 <hr>
 
 Lightweight interface to scikit-learn with 2 classes, Classifier and Regressor. 
 
-![PyPI](https://img.shields.io/pypi/v/machinelearner) [![PyPI - License](https://img.shields.io/pypi/l/machinelearner)](https://github.com/Techtonique/machinelearner/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/machinelearner)](https://pepy.tech/project/machinelearner) 
-[![HitCount](https://hits.dwyl.com/Techtonique/machinelearner.svg?style=flat-square)](http://hits.dwyl.com/Techtonique/machinelearner)
-[![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/machinelearner/)
+![PyPI](https://img.shields.io/pypi/v/tisthemachinelearner) [![PyPI - License](https://img.shields.io/pypi/l/tisthemachinelearner)](https://github.com/Techtonique/tisthemachinelearner/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/tisthemachinelearner)](https://pepy.tech/project/tisthemachinelearner) 
+[![HitCount](https://hits.dwyl.com/Techtonique/tisthemachinelearner.svg?style=flat-square)](http://hits.dwyl.com/Techtonique/tisthemachinelearner)
+[![Documentation](https://img.shields.io/badge/documentation-is_here-green)](https://techtonique.github.io/tisthemachinelearner/)
 
 
 ## Installing (for Python and R)
@@ -17,20 +17,20 @@ Lightweight interface to scikit-learn with 2 classes, Classifier and Regressor.
 - __1st method__: by using `pip` at the command line for the stable version
 
 ```bash
-pip install machinelearner
+pip install tisthemachinelearner
 ```
 
 - __2nd method__: from Github, for the development version
 
 ```bash
-pip install git+https://github.com/Techtonique/machinelearner.git
+pip install git+https://github.com/Techtonique/tisthemachinelearner.git
 ```
 
 or 
 
 ```bash
-git clone https://github.com/Techtonique/machinelearner.git
-cd machinelearner
+git clone https://github.com/Techtonique/tisthemachinelearner.git
+cd tisthemachinelearner
 make install
 ```
 
@@ -40,7 +40,7 @@ make install
 import numpy as np
 from sklearn.datasets import load_diabetes, load_breast_cancer
 from sklearn.model_selection import train_test_split
-from machinelearner import Classifier, Regressor
+from tisthemachinelearner import Classifier, Regressor
 
 # Classification
 X, y = load_breast_cancer(return_X_y=True)
