@@ -1,5 +1,6 @@
 import importlib
 import nnetsauce as ns 
+import unifiedbooster as ub
 from sklearn.base import BaseEstimator
 
 
@@ -28,7 +29,7 @@ class BaseModel(BaseEstimator):
         - custom (bool): Whether the model is a custom nnetsauce model.
         - **kwargs: Additional parameters to pass to the model constructor.
         """
-        sklearn_modules = [
+        modules = [
             "linear_model",
             "ensemble",
             "neural_network",
@@ -39,7 +40,10 @@ class BaseModel(BaseEstimator):
             "gaussian_process",
             "naive_bayes",
             "kernel_ridge",
-        ]
+            "gbdt_regressor",
+            "gbdt_classifier"
+        ] 
+
         self.base_model = base_model
         self.custom = custom
 
@@ -48,7 +52,7 @@ class BaseModel(BaseEstimator):
         self.custom_kwargs = {k: v for k, v in kwargs.items() if k in self.CUSTOM_PARAMS}
 
         # Initialize only the base model here
-        self.model = self._load_model(base_model, sklearn_modules)(**self.base_kwargs)
+        self.model = self._load_model(base_model, modules)(**self.base_kwargs)
         
         # Custom model wrapping is handled in derived classes
 
@@ -67,8 +71,11 @@ class BaseModel(BaseEstimator):
             try:
                 module = importlib.import_module(f"sklearn.{module_name}")
                 return getattr(module, base_model)
-            except (ImportError, AttributeError):
-                continue
+            except (ImportError, AttributeError) as e:    
+                try:                     
+                    return getattr(ub, base_model)
+                except (ImportError, AttributeError) as e:
+                    continue        
 
         raise ImportError(f"Model '{base_model}' not found in scikit-learn modules.")
 

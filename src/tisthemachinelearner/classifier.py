@@ -3,6 +3,7 @@ from .base import BaseModel
 from sklearn.base import ClassifierMixin
 from .wrappedcalibratedclassifier import WrappedCalibratedClassifier
 
+
 class Classifier(BaseModel, ClassifierMixin):
     """
     Wrapper for scikit-learn classifier models.

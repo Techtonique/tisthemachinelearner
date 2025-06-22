@@ -1,10 +1,10 @@
 [project]
 name = "tisthemachinelearner"
-version = "0.4.3"
-description = "Lightweight interface to scikit-learn, with 2 classes"
+version = "0.5.0"
+description = "Lightweight interface to scikit-learn, xgboost, lightgbm, catboost, with 2 classes"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["nnetsauce"]
+dependencies = ["nnetsauce", "unifiedbooster"]
 
 [build-system]
 requires = ["hatchling"]
