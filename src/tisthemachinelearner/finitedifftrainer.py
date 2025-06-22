@@ -7,6 +7,7 @@ from tqdm import tqdm
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.stats import norm
 import nnetsauce as ns  # adjust if your import path differs
+import pandas as pd
 # import your matrix operations helper if needed (mo.rbind)
 
 class FiniteDiffRegressor(BaseModel, RegressorMixin):
@@ -95,9 +96,14 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
             elif self.optimizer == 'sgd':
                 # Sample a mini-batch for stochastic gradient
+                n_samples = X.shape[0]
                 idxs = np.random.choice(n_samples, self.batch_size, replace=False)
-                X_batch = X[idxs]
-                y_batch = y[idxs]
+                if isinstance(X, pd.DataFrame):
+                    X_batch = X.iloc[idxs,:]
+                    y_batch = y[idxs]
+                else: 
+                    X_batch = X[idxs,:]
+                    y_batch = y[idxs]
                 grad = self._compute_grad(X_batch, y_batch)
 
                 self.model.W_ -= self.lr * grad
@@ -118,6 +124,9 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
                 #print("self.model.W_", self.model.W_)
 
             elif self.optimizer == 'cd':  # coordinate descent
+
+                W_shape = self.model.W_.shape
+                W_flat_size = self.model.W_.size
                 W_flat = self.model.W_.flatten()
                 grad_flat = grad.flatten()
 
