@@ -75,26 +75,14 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	uv pip install -e . --verbose --no-cache-dir --upgrade
+	uv pip install -e .
 
 build-site: docs ## export mkdocs website to a folder		
 	cp -rf tisthemachinelearner-docs/* ../../Pro_Website/Techtonique.github.io/tisthemachinelearner
 	find . -name '__pycache__' -exec rm -fr {} +
 
-run-custom: ## run all custom examples with one command
-	find examples -maxdepth 2 -name "*custom*.py" -exec  python3 {} \;
-
 run-examples: ## run all examples with one command
 	find examples -maxdepth 2 -name "*.py" -exec  python3 {} \;
-
-run-mts: ## run all mts examples with one command
-	find examples -maxdepth 2 -name "*mts*.py" -exec  python3 {} \;
-
-run-lazy: ## run all lazy examples with one command
-	find examples -maxdepth 2 -name "lazy*.py" -exec  python3 {} \;
-
-run-conformal: ## run all lazy examples with one command
-	find examples -maxdepth 2 -name "*conformal*.py" -exec  python3 {} \;
 
 run-tests: install ## run all the tests with one command
 	pip3 install coverage nose2
