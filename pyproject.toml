@@ -1,10 +1,10 @@
 [project]
 name = "tisthemachinelearner"
-version = "0.3.3"
-description = "git"
+version = "0.4.0"
+description = "Lightweight interface to scikit-learn, with 2 classes"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["scikit-learn"]
+dependencies = ["scikit-learn", "nnetsauce"]
 
 [build-system]
 requires = ["hatchling"]

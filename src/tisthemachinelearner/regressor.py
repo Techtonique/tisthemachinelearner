@@ -1,3 +1,4 @@
+import nnetsauce as ns
 from .base import BaseModel
 from sklearn.base import RegressorMixin
 
@@ -29,4 +30,14 @@ class Regressor(BaseModel, RegressorMixin):
         print(np.sqrt(np.mean((reg.predict(X_test) - y_test) ** 2)))
         ```
     """
-    pass
+    def __init__(self, base_model, custom=False, **kwargs):
+        super().__init__(base_model, custom, **kwargs)
+        if self.custom:
+            self.model = ns.CustomRegressor(self.model, **self.custom_kwargs)
+
+    def fit(self, X, y, **kwargs):
+        """Fit the model."""
+        super().fit(X, y, **kwargs)
+        if self.custom:
+            self.model.fit(X, y)
+        return self

@@ -1,18 +1,32 @@
-from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 import importlib
+import nnetsauce as ns 
+from sklearn.base import BaseEstimator
 
 
 class BaseModel(BaseEstimator):
     """
     Base class for dynamically loading and wrapping scikit-learn models.
     """
-    def __init__(self, base_model, **kwargs):
+    # Custom parameters that should only be passed to nnetsauce models
+    CUSTOM_PARAMS = [
+        'n_hidden_features',
+        'activation_name',
+        'bias',
+        'dropout',
+        'direct_link',
+        'n_clusters',
+        'cluster_encode',
+        'type_clust'
+    ]
+
+    def __init__(self, base_model, custom=False, **kwargs):
         """
         Initialize a scikit-learn model dynamically.
 
         Parameters:
         - base_model (str): The class name of the scikit-learn model (e.g., 'LogisticRegression').
-        - **kwargs: Additional parameters to pass to the scikit-learn model constructor.
+        - custom (bool): Whether the model is a custom nnetsauce model.
+        - **kwargs: Additional parameters to pass to the model constructor.
         """
         sklearn_modules = [
             "linear_model",
@@ -27,8 +41,16 @@ class BaseModel(BaseEstimator):
             "kernel_ridge",
         ]
         self.base_model = base_model
-        self.model_params = kwargs
-        self.model = self._load_model(base_model, sklearn_modules)(**kwargs)
+        self.custom = custom
+
+        # Split kwargs into base and custom parameters
+        self.base_kwargs = {k: v for k, v in kwargs.items() if k not in self.CUSTOM_PARAMS}
+        self.custom_kwargs = {k: v for k, v in kwargs.items() if k in self.CUSTOM_PARAMS}
+
+        # Initialize only the base model here
+        self.model = self._load_model(base_model, sklearn_modules)(**self.base_kwargs)
+        
+        # Custom model wrapping is handled in derived classes
 
     def _load_model(self, base_model, modules):
         """
@@ -57,7 +79,7 @@ class BaseModel(BaseEstimator):
         Parameters:
         - X (array-like): Training data features.
         - y (array-like): Target values.
-        - **kwargs: Additional parameters to pass to the scikit-learn model fit method.
+        - **kwargs: Additional parameters to pass to the model fit method.
         """
         self.model.fit(X, y, **kwargs)
         return self
@@ -68,7 +90,7 @@ class BaseModel(BaseEstimator):
 
         Parameters:
         - X (array-like): Input data.
-        - **kwargs: Additional parameters to pass to the scikit-learn model predict method.
+        - **kwargs: Additional parameters to pass to the model predict method.
         Returns:
         - array-like: Predictions.
         """
@@ -81,7 +103,7 @@ class BaseModel(BaseEstimator):
         Parameters:
         - X (array-like): Test data features.
         - y (array-like): True labels.
-        - **kwargs: Additional parameters to pass to the scikit-learn model score method.
+        - **kwargs: Additional parameters to pass to the model score method.
         
         Returns:
         - float: The score.
