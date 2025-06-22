@@ -161,8 +161,6 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
             return self
 
-        print("self.model.W_ in class L.129", self.model.W_)
-        
         return self
 
 
