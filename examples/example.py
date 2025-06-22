@@ -49,6 +49,7 @@ clf = Classifier("LogisticRegression", custom=True, n_hidden_features=3, random_
 clf.fit(X_train, y_train)
 print(clf.predict(X_test))
 print(clf.score(X_test, y_test))
+print("clf.model.W_", clf.model.W_)
 
 X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
