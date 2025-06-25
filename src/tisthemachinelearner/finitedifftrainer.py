@@ -11,7 +11,7 @@ import pandas as pd
 # import your matrix operations helper if needed (mo.rbind)
 
 class FiniteDiffRegressor(BaseModel, RegressorMixin):
-    def __init__(self, base_model, lr=1e-4, optimizer='gd', eps=1e-3, batch_size=32, **kwargs):
+    def __init__(self, base_model, lr=1e-4, optimizer='gd', eps=1e-3, batch_size=32, alpha=0.0, l1_ratio=0.5, **kwargs):
         """
         Finite difference trainer for nnetsauce models.
 
@@ -20,6 +20,8 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
             lr: learning rate.
             optimizer: 'gd' (gradient descent) 'sgd' (stochastic gradient descent) or 'adam' or 'cd' (coordinate descent).
             eps: scaling factor for adaptive finite difference step size.
+            alpha: Elastic net penalty strength.
+            l1_ratio: Elastic net mixing parameter (0 = Ridge, 1 = Lasso).
             **kwargs: Additional parameters to pass to the scikit-learn model.
         """
         super().__init__(base_model, True, **kwargs)
@@ -34,10 +36,17 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self.batch_size = batch_size  # for SGD
         self.loss_history_ = []
         self._cd_index = 0  # For coordinate descent
+        self.alpha = alpha
+        self.l1_ratio = l1_ratio
 
     def _loss(self, X, y):
         y_pred = self.model.predict(X)
-        return np.sqrt(np.mean((y - y_pred) ** 2))
+        mse = np.mean((y - y_pred) ** 2)
+        W = self.model.W_
+        l1 = np.sum(np.abs(W))
+        l2 = np.sum(W ** 2)
+        penalty = self.alpha * (self.l1_ratio * l1 + 0.5 * (1 - self.l1_ratio) * l2)
+        return np.sqrt(mse) + penalty
 
     def _compute_grad(self, X, y):
         W = deepcopy(self.model.W_)
@@ -64,6 +73,12 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
             loss_minus[i] = self._loss(X, y)
 
         grad = ((loss_plus - loss_minus) / (2 * h_vec)).reshape(shape)
+
+        # Add elastic net gradient
+        l1_grad = self.alpha * self.l1_ratio * np.sign(W)
+        l2_grad = self.alpha * (1 - self.l1_ratio) * W
+        grad += l1_grad + l2_grad
+
         self.model.W_ = W  # restore original
         return grad
 
