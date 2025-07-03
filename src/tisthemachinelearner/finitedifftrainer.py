@@ -1,27 +1,47 @@
+import nnetsauce as ns  # adjust if your import path differs
+import pandas as pd
+import numpy as np
+
 from .base import BaseModel
 from sklearn.base import RegressorMixin
 from copy import deepcopy
 from collections import namedtuple
-import numpy as np
 from tqdm import tqdm
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.stats import norm
-import nnetsauce as ns  # adjust if your import path differs
-import pandas as pd
+from sklearn.metrics import mean_pinball_loss
 # import your matrix operations helper if needed (mo.rbind)
 
 class FiniteDiffRegressor(BaseModel, RegressorMixin):
-    def __init__(self, base_model, lr=1e-4, optimizer='gd', eps=1e-3, batch_size=32, alpha=0.0, l1_ratio=0.5, **kwargs):
+    def __init__(self, base_model, 
+        lr=1e-4, optimizer='gd', 
+        eps=1e-3, batch_size=32, 
+        alpha=0.0, l1_ratio=0.0, 
+        type_loss="mse", q=0.5,
+        **kwargs):
         """
         Finite difference trainer for nnetsauce models.
 
         Args:
-            model: trained nnetsauce model.
+
+            base_model: a string, the name of the model.
+
             lr: learning rate.
+
             optimizer: 'gd' (gradient descent) 'sgd' (stochastic gradient descent) or 'adam' or 'cd' (coordinate descent).
+
             eps: scaling factor for adaptive finite difference step size.
+
+            batch_size: integer, size of batch for 'sgd'
+
             alpha: Elastic net penalty strength.
+
             l1_ratio: Elastic net mixing parameter (0 = Ridge, 1 = Lasso).
+
+            type_loss: Type of loss functions (currently "mse" or "quantile")
+
+            q: quantile for `type_loss = 'quantile'`
+
             **kwargs: Additional parameters to pass to the scikit-learn model.
         """
         super().__init__(base_model, True, **kwargs)
@@ -38,15 +58,19 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self._cd_index = 0  # For coordinate descent
         self.alpha = alpha
         self.l1_ratio = l1_ratio
+        self.type_loss = type_loss
+        self.q = q
 
-    def _loss(self, X, y):
+    def _loss(self, X, y, **kwargs):        
         y_pred = self.model.predict(X)
-        mse = np.mean((y - y_pred) ** 2)
+        if self.type_loss == "mse": 
+            loss = np.mean((y - y_pred) ** 2)            
+        elif self.type_loss == "quantile":
+            loss = mean_pinball_loss(y, y_pred, alpha=self.q, **kwargs)
         W = self.model.W_
         l1 = np.sum(np.abs(W))
         l2 = np.sum(W ** 2)
-        penalty = self.alpha * (self.l1_ratio * l1 + 0.5 * (1 - self.l1_ratio) * l2)
-        return np.sqrt(mse) + penalty
+        return loss + self.alpha * (self.l1_ratio * l1 + 0.5 * (1 - self.l1_ratio) * l2)
 
     def _compute_grad(self, X, y):
         W = deepcopy(self.model.W_)
@@ -82,21 +106,28 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self.model.W_ = W  # restore original
         return grad
 
-    def fit(self, X, y, sample_weight=None, epochs=10, verbose=True, show_progress=True, **kwargs):
+    def fit(self, X, y, epochs=10, verbose=True, show_progress=True, sample_weight=None, **kwargs):
         """
         Optimizes W_ using finite differences and retrains readout.
 
         Args:
+
             X, y: data to compute loss and retrain output
+
             epochs: number of optimization steps
+
             verbose: whether to print progress messages
+
             show_progress: whether to show tqdm progress bar
 
+            sample_weight: weight for observations
+
         Returns:
+
             self (enables method chaining)
-        """
-        # Initial fit of output layer with current W_
-        # Final retrain after updates
+
+        """        
+
         self.model.fit(X, y)
 
         iterator = tqdm(range(epochs)) if show_progress else range(epochs)
@@ -115,10 +146,9 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
                 idxs = np.random.choice(n_samples, self.batch_size, replace=False)
                 if isinstance(X, pd.DataFrame):
                     X_batch = X.iloc[idxs,:]
-                    y_batch = y[idxs]
                 else: 
                     X_batch = X[idxs,:]
-                    y_batch = y[idxs]
+                y_batch = y[idxs]
                 grad = self._compute_grad(X_batch, y_batch)
 
                 self.model.W_ -= self.lr * grad
@@ -166,7 +196,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
                 print(f"Epoch {epoch+1}: Loss = {loss:.6f}")                
 
         # if sample_weights, else: (must use self.row_index)
-        if sample_weight is not None:
+        if sample_weight in kwargs:
             self.model.fit(
                 X,
                 y,
