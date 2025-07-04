@@ -18,27 +18,38 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
     Parameters
     ----------
+
     base_model : str
         The name of the base model (e.g., 'RidgeCV').
+
     lr : float, optional
         Learning rate for optimization (default=1e-4).
+
     optimizer : {'gd', 'sgd', 'adam', 'cd'}, optional
         Optimization algorithm: gradient descent ('gd'), stochastic gradient descent ('sgd'),
         Adam ('adam'), or coordinate descent ('cd'). Default is 'gd'.
+
     eps : float, optional
         Scaling factor for adaptive finite difference step size (default=1e-3).
+
     batch_size : int, optional
         Batch size for 'sgd' optimizer (default=32).
+
     alpha : float, optional
         Elastic net penalty strength (default=0.0).
+
     l1_ratio : float, optional
         Elastic net mixing parameter (0 = Ridge, 1 = Lasso, default=0.0).
+
     type_loss : {'mse', 'quantile'}, optional
         Type of loss function to use (default='mse').
+
     q : float, optional
         Quantile for quantile loss (default=0.5).
+
     **kwargs
         Additional parameters to pass to the scikit-learn model.
+
     """
 
     def __init__(self, base_model, 
@@ -70,10 +81,13 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
         Parameters
         ----------
+
         X : array-like of shape (n_samples, n_features)
             Input data.
+
         y : array-like of shape (n_samples,)
             Target values.
+
         **kwargs
             Additional keyword arguments for loss calculation.
 
@@ -98,13 +112,16 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
         Parameters
         ----------
+
         X : array-like of shape (n_samples, n_features)
             Input data.
+
         y : array-like of shape (n_samples,)
             Target values.
 
         Returns
         -------
+
         ndarray
             Gradient array with the same shape as W_.
         """
@@ -147,23 +164,31 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
         Parameters
         ----------
+
         X : array-like of shape (n_samples, n_features)
             Training data.
+
         y : array-like of shape (n_samples,)
             Target values.
+
         epochs : int, optional
             Number of optimization steps (default=10).
+
         verbose : bool, optional
             Whether to print progress messages (default=True).
+
         show_progress : bool, optional
             Whether to show tqdm progress bar (default=True).
+
         sample_weight : array-like, optional
             Sample weights.
+
         **kwargs
             Additional keyword arguments.
 
         Returns
         -------
+
         self : object
             Returns self.
         """        
@@ -255,18 +280,23 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
         Parameters
         ----------
+
         X : array-like of shape (n_samples, n_features)
             Input data.
+
         level : int, optional
             Level of confidence for prediction intervals (default=95).
+
         method : {'splitconformal', 'localconformal'}, optional
             Method for conformal prediction (default='splitconformal').
+
         **kwargs
             Additional keyword arguments. Use `return_pi=True` for prediction intervals,
             or `return_std=True` for standard deviation estimates.
 
         Returns
         -------
+        
         array or tuple
             Model predictions, or a tuple with prediction intervals or standard deviations if requested.
         """

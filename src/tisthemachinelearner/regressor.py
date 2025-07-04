@@ -8,7 +8,9 @@ class Regressor(BaseModel, RegressorMixin):
     Wrapper for scikit-learn regressor models.
 
     Parameters:
+
     - model_name (str): The name of the scikit-learn regressor model.
+    
     - **kwargs: Additional parameters to pass to the scikit-learn model.
 
     Examples:
