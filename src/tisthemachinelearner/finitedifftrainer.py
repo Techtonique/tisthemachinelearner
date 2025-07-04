@@ -13,37 +13,40 @@ from sklearn.metrics import mean_pinball_loss
 # import your matrix operations helper if needed (mo.rbind)
 
 class FiniteDiffRegressor(BaseModel, RegressorMixin):
+    """
+    Finite difference trainer for nnetsauce models.
+
+    Parameters
+    ----------
+    base_model : str
+        The name of the base model (e.g., 'RidgeCV').
+    lr : float, optional
+        Learning rate for optimization (default=1e-4).
+    optimizer : {'gd', 'sgd', 'adam', 'cd'}, optional
+        Optimization algorithm: gradient descent ('gd'), stochastic gradient descent ('sgd'),
+        Adam ('adam'), or coordinate descent ('cd'). Default is 'gd'.
+    eps : float, optional
+        Scaling factor for adaptive finite difference step size (default=1e-3).
+    batch_size : int, optional
+        Batch size for 'sgd' optimizer (default=32).
+    alpha : float, optional
+        Elastic net penalty strength (default=0.0).
+    l1_ratio : float, optional
+        Elastic net mixing parameter (0 = Ridge, 1 = Lasso, default=0.0).
+    type_loss : {'mse', 'quantile'}, optional
+        Type of loss function to use (default='mse').
+    q : float, optional
+        Quantile for quantile loss (default=0.5).
+    **kwargs
+        Additional parameters to pass to the scikit-learn model.
+    """
+
     def __init__(self, base_model, 
         lr=1e-4, optimizer='gd', 
         eps=1e-3, batch_size=32, 
         alpha=0.0, l1_ratio=0.0, 
         type_loss="mse", q=0.5,
         **kwargs):
-        """
-        Finite difference trainer for nnetsauce models.
-
-        Args:
-
-            base_model: a string, the name of the model.
-
-            lr: learning rate.
-
-            optimizer: 'gd' (gradient descent) 'sgd' (stochastic gradient descent) or 'adam' or 'cd' (coordinate descent).
-
-            eps: scaling factor for adaptive finite difference step size.
-
-            batch_size: integer, size of batch for 'sgd'
-
-            alpha: Elastic net penalty strength.
-
-            l1_ratio: Elastic net mixing parameter (0 = Ridge, 1 = Lasso).
-
-            type_loss: Type of loss functions (currently "mse" or "quantile")
-
-            q: quantile for `type_loss = 'quantile'`
-
-            **kwargs: Additional parameters to pass to the scikit-learn model.
-        """
         super().__init__(base_model, True, **kwargs)
         self.model = ns.CustomRegressor(self.model, **self.custom_kwargs)
         assert isinstance(self.model, ns.CustomRegressor),\
@@ -61,7 +64,24 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self.type_loss = type_loss
         self.q = q
 
-    def _loss(self, X, y, **kwargs):        
+    def _loss(self, X, y, **kwargs):
+        """
+        Compute the loss (with elastic net penalty) for the current model.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data.
+        y : array-like of shape (n_samples,)
+            Target values.
+        **kwargs
+            Additional keyword arguments for loss calculation.
+
+        Returns
+        -------
+        float
+            The computed loss value.
+        """
         y_pred = self.model.predict(X)
         if self.type_loss == "mse": 
             loss = np.mean((y - y_pred) ** 2)            
@@ -73,6 +93,21 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         return loss + self.alpha * (self.l1_ratio * l1 + 0.5 * (1 - self.l1_ratio) * l2)
 
     def _compute_grad(self, X, y):
+        """
+        Compute the gradient of the loss with respect to W_ using finite differences.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data.
+        y : array-like of shape (n_samples,)
+            Target values.
+
+        Returns
+        -------
+        ndarray
+            Gradient array with the same shape as W_.
+        """
         W = deepcopy(self.model.W_)
         shape = W.shape
         W_flat = W.flatten()
@@ -108,24 +143,29 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
     def fit(self, X, y, epochs=10, verbose=True, show_progress=True, sample_weight=None, **kwargs):
         """
-        Optimizes W_ using finite differences and retrains readout.
+        Fit the model using finite difference optimization.
 
-        Args:
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+        y : array-like of shape (n_samples,)
+            Target values.
+        epochs : int, optional
+            Number of optimization steps (default=10).
+        verbose : bool, optional
+            Whether to print progress messages (default=True).
+        show_progress : bool, optional
+            Whether to show tqdm progress bar (default=True).
+        sample_weight : array-like, optional
+            Sample weights.
+        **kwargs
+            Additional keyword arguments.
 
-            X, y: data to compute loss and retrain output
-
-            epochs: number of optimization steps
-
-            verbose: whether to print progress messages
-
-            show_progress: whether to show tqdm progress bar
-
-            sample_weight: weight for observations
-
-        Returns:
-
-            self (enables method chaining)
-
+        Returns
+        -------
+        self : object
+            Returns self.
         """        
 
         self.model.fit(X, y)
@@ -210,40 +250,26 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
 
     def predict(self, X, level=95, method='splitconformal', **kwargs):
-        """Predict test data X.
-
-        Parameters:
-
-            X: {array-like}, shape = [n_samples, n_features]
-                Training vectors, where n_samples is the number
-                of samples and n_features is the number of features.
-
-            level: int
-                Level of confidence (default = 95)
-
-            method: str
-                'splitconformal', 'localconformal'
-                prediction (if you specify `return_pi = True`)
-
-            **kwargs: additional parameters
-                    `return_pi = True` for conformal prediction,
-                    with `method` in ('splitconformal', 'localconformal')
-                    or `return_std = True` for `self.model` in
-                    (`sklearn.linear_model.BayesianRidge`,
-                    `sklearn.linear_model.ARDRegressor`,
-                    `sklearn.gaussian_process.GaussianProcessRegressor`)`
-
-        Returns:
-
-            model predictions:
-                an array if uncertainty quantification is not requested,
-                  or a tuple if with prediction intervals and simulations
-                  if `return_std = True` (mean, standard deviation,
-                  lower and upper prediction interval) or `return_pi = True`
-                  ()
-
         """
+        Predict using the trained model.
 
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data.
+        level : int, optional
+            Level of confidence for prediction intervals (default=95).
+        method : {'splitconformal', 'localconformal'}, optional
+            Method for conformal prediction (default='splitconformal').
+        **kwargs
+            Additional keyword arguments. Use `return_pi=True` for prediction intervals,
+            or `return_std=True` for standard deviation estimates.
+
+        Returns
+        -------
+        array or tuple
+            Model predictions, or a tuple with prediction intervals or standard deviations if requested.
+        """
         if "return_std" in kwargs:
 
             alpha = 100 - level

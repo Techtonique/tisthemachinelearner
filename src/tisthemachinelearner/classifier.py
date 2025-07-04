@@ -13,6 +13,7 @@ class Classifier(BaseModel, ClassifierMixin):
     - **kwargs: Additional parameters to pass to the scikit-learn model.
 
     Examples:
+    
         ```python
         from sklearn.model_selection import train_test_split
         from sklearn.datasets import load_breast_cancer
