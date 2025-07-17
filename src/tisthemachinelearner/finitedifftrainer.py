@@ -79,23 +79,13 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self._cd_index = 0
         self._is_initialized = False
 
-    def _initialize_weights(self, X):
+    def _initialize_weights(self, X, y):
         """Initialize weights using proper neural network initialization"""
-        input_dim = X.shape[1]
-        
-        # Get model architecture details
-        n_hidden = getattr(self.model, 'n_hidden_features')
-        n_clusters = getattr(self.model, 'n_clusters')
-        
-        # Determine weight shape
-        if n_clusters >= 0:
-            shape = (input_dim, n_hidden + n_clusters)
-        else:
-            shape = (input_dim, n_hidden)
-        
+        self.model.fit(X, y)
+        input_dim = X.shape[1]        
         # He initialization (good for ReLU-like activations)
         scale = np.sqrt(2.0 / input_dim)
-        self.model.W_ = np.random.normal(0, scale, size=shape)
+        self.model.W_ = np.random.normal(0, scale, size=self.model.W_.shape)
         self._is_initialized = True
 
     def _loss(self, X, y, **kwargs):
