@@ -12,7 +12,7 @@ from scipy.stats import norm
 from sklearn.metrics import mean_pinball_loss
 # import your matrix operations helper if needed (mo.rbind)
 
-class FiniteDiffRegressor(BaseModel, RegressorMixin):
+class FiniteDiffRegressor(BaseModel, ns.CustomRegressor):
     """
     Finite difference trainer for nnetsauce models.
 
@@ -60,6 +60,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
                 eps=1e-4, batch_size=32, 
                 alpha=0.0, l1_ratio=0.0, 
                 type_loss="mse", q=0.5,
+                 conformalize = False,
                 seed=123, **kwargs):
         super().__init__(base_model, True, **kwargs)
         self.model = ns.CustomRegressor(self.model, **self.custom_kwargs)
@@ -75,6 +76,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self.l1_ratio = l1_ratio
         self.type_loss = type_loss
         self.q = q
+        self.conformalize = conformalize
         self.seed = seed
         
         # Training state
@@ -85,6 +87,15 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
     def _initialize_weights(self, X, y):
         """Initialize weights using proper neural network initialization"""
+        if self.conformalize:
+            self.model = ns.PredictionInterval(
+                obj=self.model,
+                method=method,
+                level=level,
+                type_pi=self.type_pi,
+                replications=self.replications,
+                kernel=self.kernel,
+            )
         self.model.fit(X, y)
         input_dim = X.shape[1]        
         # He initialization (good for ReLU-like activations)
@@ -269,7 +280,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
 
                 mean_, std_ = self.model.predict(
                     new_X, return_std=True
-                )[0]
+                )
 
                 preds =  mean_
                 lower =  (mean_ - pi_multiplier * std_)
@@ -295,51 +306,3 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
             )
 
             return DescribeResults(preds, std_, lower, upper)
-
-        if "return_pi" in kwargs:
-            assert method in (
-                "splitconformal",
-                "localconformal",
-            ), "method must be in ('splitconformal', 'localconformal')"
-            self.pi = ns.PredictionInterval(
-                obj=self,
-                method=method,
-                level=level,
-                type_pi=self.type_pi,
-                replications=self.replications,
-                kernel=self.kernel,
-            )
-
-            if len(self.X_.shape) == 1:
-                if isinstance(X, pd.DataFrame):
-                    self.X_ = pd.DataFrame(
-                        self.X_.values.reshape(1, -1), columns=self.X_.columns
-                    )
-                else:
-                    self.X_ = self.X_.reshape(1, -1)
-                self.y_ = np.array([self.y_])
-
-            self.pi.fit(self.X_, self.y_)
-            # self.X_ = None # consumes memory to keep, dangerous to delete (side effect)
-            # self.y_ = None # consumes memory to keep, dangerous to delete (side effect)
-            preds = self.pi.predict(X, return_pi=True)
-            return preds
-
-        # "return_std" not in kwargs
-        if len(X.shape) == 1:
-
-            n_features = X.shape[0]
-            new_X = mo.rbind(
-                X.reshape(1, n_features),
-                np.ones(n_features).reshape(1, n_features),
-            )
-
-            return (
-                0
-                + self.model.predict(new_X, **kwargs)
-            )[0]
-
-        # len(X.shape) > 1
-        return  self.model.predict(
-            X, **kwargs
-        )
