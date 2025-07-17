@@ -306,3 +306,22 @@ class FiniteDiffRegressor(BaseModel, ns.CustomRegressor):
             )
 
             return DescribeResults(preds, std_, lower, upper)
+
+        # "return_std" not in kwargs
+        if len(X.shape) == 1:
+
+            n_features = X.shape[0]
+            new_X = mo.rbind(
+                X.reshape(1, n_features),
+                np.ones(n_features).reshape(1, n_features),
+            )
+
+            return (
+                0
+                + self.model.predict(new_X, **kwargs)
+            )[0]
+
+        # len(X.shape) > 1
+        return  self.model.predict(
+            X, **kwargs
+        )
