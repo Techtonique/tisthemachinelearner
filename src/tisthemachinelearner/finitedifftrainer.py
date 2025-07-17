@@ -60,7 +60,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
                 eps=1e-4, batch_size=32, 
                 alpha=0.0, l1_ratio=0.0, 
                 type_loss="mse", q=0.5,
-                **kwargs):
+                seed=123, **kwargs):
         super().__init__(base_model, True, **kwargs)
         self.model = ns.CustomRegressor(self.model, **self.custom_kwargs)
         assert isinstance(self.model, ns.CustomRegressor), \
