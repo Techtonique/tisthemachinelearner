@@ -47,6 +47,9 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
     q : float, optional
         Quantile for quantile loss (default=0.5).
 
+    seed : int 
+        Random seed. 
+
     **kwargs
         Additional parameters to pass to the scikit-learn model.
 
@@ -72,6 +75,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         self.l1_ratio = l1_ratio
         self.type_loss = type_loss
         self.q = q
+        self.seed = seed
         
         # Training state
         self.loss_history_ = []
@@ -85,6 +89,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         input_dim = X.shape[1]        
         # He initialization (good for ReLU-like activations)
         scale = np.sqrt(2.0 / input_dim)
+        np.random.seed(self.seed)
         self.model.W_ = np.random.normal(0, scale, size=self.model.W_.shape)
         self._is_initialized = True
 
@@ -108,7 +113,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
     def _compute_grad(self, X, y):
         """Compute gradient using finite differences"""
         if not self._is_initialized:
-            self._initialize_weights(X)
+            self._initialize_weights(X, y)
             
         W = self.model.W_.copy()  # Use current weights
         shape = W.shape
@@ -152,7 +157,7 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         """Fit model using finite difference optimization"""
         # Initialize weights if not already done
         if not self._is_initialized:
-            self._initialize_weights(X)
+            self._initialize_weights(X, y)
         
         # Training loop
         iterator = tqdm(range(epochs)) if show_progress else range(epochs)
