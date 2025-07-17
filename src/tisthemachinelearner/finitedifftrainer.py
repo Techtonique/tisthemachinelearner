@@ -161,7 +161,7 @@ class FiniteDiffRegressor(BaseModel, ns.CustomRegressor):
         grad += self.alpha * (1 - self.l1_ratio) * W
         
         # Restore original weights
-        self.model.W_ = W
+        #self.model.W_ = W
         return grad
 
     def fit(self, X, y, epochs=10, verbose=True, show_progress=True, sample_weight=None, **kwargs):
