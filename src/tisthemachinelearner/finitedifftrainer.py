@@ -84,8 +84,8 @@ class FiniteDiffRegressor(BaseModel, RegressorMixin):
         input_dim = X.shape[1]
         
         # Get model architecture details
-        n_hidden = getattr(self.model, 'n_hidden_features', 1)
-        n_clusters = getattr(self.model, 'n_clusters', -1)
+        n_hidden = getattr(self.model, 'n_hidden_features')
+        n_clusters = getattr(self.model, 'n_clusters')
         
         # Determine weight shape
         if n_clusters >= 0:
