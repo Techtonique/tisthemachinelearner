@@ -72,4 +72,9 @@ print(np.sqrt(np.mean((reg.predict(X_test) - y_test) ** 2)))
 
 ## License
 
-[BSD 3-Clause](LICENSE) © T. Moudiki, 2025. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+This software contains code derived from [scikit-learn](https://scikit-learn.org/), 
+which is licensed under the BSD 3-Clause License. See [NOTICE](NOTICE) file for details.
