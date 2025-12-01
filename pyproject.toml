@@ -5,6 +5,10 @@ description = "Lightweight interface to scikit-learn, xgboost, lightgbm, catboos
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = ["nnetsauce", "unifiedbooster"]
+license = {text = "MIT"}
+authors = [
+    {name = "T. Moudiki"}
+]
 
 [build-system]
 requires = ["hatchling"]
